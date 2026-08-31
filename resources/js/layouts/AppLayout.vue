@@ -39,5 +39,5 @@ const mobileSidebarOpen = ref(false);
     </div>
 
     <FlashToasts />
-    <ConfirmDialog />
+    <ConfirmDialog :style="{ width: '36rem' }" />
 </template>

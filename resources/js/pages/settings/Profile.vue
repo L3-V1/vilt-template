@@ -121,7 +121,9 @@ function confirmDelete() {
                                             id="email"
                                             v-model="profileForm.email"
                                             type="email"
-                                            :invalid="!!profileForm.errors.email"
+                                            :invalid="
+                                                !!profileForm.errors.email
+                                            "
                                             fluid
                                         />
                                         <Message
@@ -139,6 +141,7 @@ function confirmDelete() {
                                     <Button
                                         type="submit"
                                         label="Salvar"
+                                        icon="pi pi-save"
                                         :loading="profileForm.processing"
                                     />
                                 </div>
@@ -238,6 +241,7 @@ function confirmDelete() {
                                     <Button
                                         type="submit"
                                         label="Atualizar senha"
+                                        icon="pi pi-key"
                                         :loading="passwordForm.processing"
                                     />
                                 </div>
@@ -289,6 +293,7 @@ function confirmDelete() {
                                     <Button
                                         type="submit"
                                         label="Excluir minha conta"
+                                        icon="pi pi-trash"
                                         severity="danger"
                                         :loading="deleteForm.processing"
                                     />

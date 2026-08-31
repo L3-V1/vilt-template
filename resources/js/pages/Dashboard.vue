@@ -14,7 +14,7 @@ const user = computed(() => usePage().props.auth.user as User | null);
     <div class="space-y-4">
         <Breadcrumbs :items="[{ label: 'Dashboard' }]" />
 
-        <Card>
+        <Card class="w-full">
             <template #title>Bem-vindo(a), {{ user?.name }}</template>
             <template #content>
                 <p class="text-surface-500">
