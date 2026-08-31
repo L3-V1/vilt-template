@@ -1,110 +1,106 @@
 <script setup lang="ts">
-import { Form, Head } from '@inertiajs/vue3';
-import InputError from '@/components/InputError.vue';
-import PasswordInput from '@/components/PasswordInput.vue';
-import TextLink from '@/components/TextLink.vue';
-import { Button } from '@/components/ui/button';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Spinner } from '@/components/ui/spinner';
-import { register } from '@/routes';
-import { store } from '@/routes/login';
-import { request } from '@/routes/password';
-import PasskeyVerify from '@/components/PasskeyVerify.vue';
+import { Head, Link, useForm } from '@inertiajs/vue3';
+import Button from 'primevue/button';
+import Card from 'primevue/card';
+import Checkbox from 'primevue/checkbox';
+import InputText from 'primevue/inputtext';
+import Message from 'primevue/message';
+import Password from 'primevue/password';
+import { route } from 'ziggy-js';
 
-defineOptions({
-    layout: {
-        title: 'Log in to your account',
-        description: 'Enter your email and password below to log in',
-    },
+const form = useForm({
+    email: '',
+    password: '',
+    remember: false,
 });
 
-defineProps<{
-    status?: string;
-    canResetPassword: boolean;
-}>();
+function submit() {
+    form.post(route('login.store'), {
+        onFinish: () => form.reset('password'),
+    });
+}
 </script>
 
 <template>
-    <Head title="Log in" />
+    <Head title="Entrar" />
 
-    <div
-        v-if="status"
-        class="mb-4 text-center text-sm font-medium text-green-600"
-    >
-        {{ status }}
-    </div>
-
-    <PasskeyVerify />
-
-    <Form
-        v-bind="store.form()"
-        :reset-on-success="['password']"
-        v-slot="{ errors, processing }"
-        class="flex flex-col gap-6"
-    >
-        <div class="grid gap-6">
-            <div class="grid gap-2">
-                <Label for="email">Email address</Label>
-                <Input
-                    id="email"
-                    type="email"
-                    name="email"
-                    required
-                    autofocus
-                    :tabindex="1"
-                    autocomplete="email"
-                    placeholder="email@example.com"
-                />
-                <InputError :message="errors.email" />
-            </div>
-
-            <div class="grid gap-2">
-                <div class="flex items-center justify-between">
-                    <Label for="password">Password</Label>
-                    <TextLink
-                        v-if="canResetPassword"
-                        :href="request()"
-                        class="text-sm"
-                        :tabindex="5"
+    <Card>
+        <template #title>Entrar</template>
+        <template #subtitle>Acesse sua conta para continuar</template>
+        <template #content>
+            <form class="flex flex-col gap-4" @submit.prevent="submit">
+                <div class="flex flex-col gap-1">
+                    <label for="email" class="text-sm font-medium"
+                        >E-mail</label
                     >
-                        Forgot your password?
-                    </TextLink>
+                    <InputText
+                        id="email"
+                        v-model="form.email"
+                        type="email"
+                        autocomplete="email"
+                        autofocus
+                        :invalid="!!form.errors.email"
+                        fluid
+                    />
+                    <Message
+                        v-if="form.errors.email"
+                        severity="error"
+                        variant="simple"
+                        size="small"
+                    >
+                        {{ form.errors.email }}
+                    </Message>
                 </div>
-                <PasswordInput
-                    id="password"
-                    name="password"
-                    required
-                    :tabindex="2"
-                    autocomplete="current-password"
-                    placeholder="Password"
+
+                <div class="flex flex-col gap-1">
+                    <label for="password" class="text-sm font-medium"
+                        >Senha</label
+                    >
+                    <Password
+                        input-id="password"
+                        v-model="form.password"
+                        :feedback="false"
+                        toggle-mask
+                        autocomplete="current-password"
+                        :invalid="!!form.errors.password"
+                        fluid
+                    />
+                    <Message
+                        v-if="form.errors.password"
+                        severity="error"
+                        variant="simple"
+                        size="small"
+                    >
+                        {{ form.errors.password }}
+                    </Message>
+                </div>
+
+                <div class="flex items-center gap-2">
+                    <Checkbox
+                        input-id="remember"
+                        v-model="form.remember"
+                        :binary="true"
+                    />
+                    <label for="remember" class="text-sm">Lembrar de mim</label>
+                </div>
+
+                <Button
+                    type="submit"
+                    label="Entrar"
+                    :loading="form.processing"
+                    fluid
                 />
-                <InputError :message="errors.password" />
-            </div>
 
-            <div class="flex items-center justify-between">
-                <Label for="remember" class="flex items-center space-x-3">
-                    <Checkbox id="remember" name="remember" :tabindex="3" />
-                    <span>Remember me</span>
-                </Label>
-            </div>
-
-            <Button
-                type="submit"
-                class="mt-4 w-full"
-                :tabindex="4"
-                :disabled="processing"
-                data-test="login-button"
-            >
-                <Spinner v-if="processing" />
-                Log in
-            </Button>
-        </div>
-
-        <div class="text-muted-foreground text-center text-sm">
-            Don't have an account?
-            <TextLink :href="register()" :tabindex="5">Sign up</TextLink>
-        </div>
-    </Form>
+                <p class="text-surface-500 text-center text-sm">
+                    Não tem conta?
+                    <Link
+                        :href="route('register')"
+                        class="text-primary font-medium"
+                    >
+                        Cadastre-se
+                    </Link>
+                </p>
+            </form>
+        </template>
+    </Card>
 </template>

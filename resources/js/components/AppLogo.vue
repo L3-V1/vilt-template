@@ -1,19 +1,20 @@
 <script setup lang="ts">
 import { usePage } from '@inertiajs/vue3';
-import AppLogoIcon from '@/components/AppLogoIcon.vue';
+import { Boxes } from '@lucide/vue';
+import { computed } from 'vue';
 
-const name = usePage().props.name;
+const name = computed(
+    () => (usePage().props.name as string | undefined) ?? 'Laravel',
+);
 </script>
 
 <template>
-    <div
-        class="bg-sidebar-primary text-sidebar-primary-foreground flex aspect-square size-8 items-center justify-center rounded-md"
-    >
-        <AppLogoIcon class="size-5 fill-current text-white dark:text-black" />
-    </div>
-    <div class="ml-1 grid flex-1 text-left text-sm">
-        <span class="mb-0.5 truncate leading-tight font-semibold">{{
-            name
-        }}</span>
-    </div>
+    <span class="flex items-center gap-2 font-semibold">
+        <span
+            class="bg-primary text-primary-contrast flex size-8 items-center justify-center rounded-md"
+        >
+            <Boxes class="size-5" />
+        </span>
+        <span class="truncate">{{ name }}</span>
+    </span>
 </template>

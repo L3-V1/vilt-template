@@ -1,66 +1,59 @@
 <script setup lang="ts">
-import { Link } from '@inertiajs/vue3';
-import { BookOpen, FolderGit2, LayoutGrid } from '@lucide/vue';
+import { Link, usePage } from '@inertiajs/vue3';
+import { LayoutGrid, UserRound } from '@lucide/vue';
+import { computed } from 'vue';
+import { route } from 'ziggy-js';
 import AppLogo from '@/components/AppLogo.vue';
-import NavFooter from '@/components/NavFooter.vue';
-import NavMain from '@/components/NavMain.vue';
-import NavUser from '@/components/NavUser.vue';
-import {
-    Sidebar,
-    SidebarContent,
-    SidebarFooter,
-    SidebarHeader,
-    SidebarMenu,
-    SidebarMenuButton,
-    SidebarMenuItem,
-} from '@/components/ui/sidebar';
-import { dashboard } from '@/routes';
 import type { NavItem } from '@/types';
 
-const mainNavItems: NavItem[] = [
-    {
-        title: 'Dashboard',
-        href: dashboard(),
-        icon: LayoutGrid,
-    },
-];
+defineEmits<{ navigate: [] }>();
 
-const footerNavItems: NavItem[] = [
-    {
-        title: 'Repository',
-        href: 'https://github.com/laravel/vue-starter-kit',
-        icon: FolderGit2,
-    },
-    {
-        title: 'Documentation',
-        href: 'https://laravel.com/docs/starter-kits#vue',
-        icon: BookOpen,
-    },
-];
+const page = usePage();
+
+const items = computed<NavItem[]>(() => {
+    // Reactive dependency: Inertia updates page.url on every SPA visit,
+    // forcing route().current() below to be re-evaluated.
+    void page.url;
+
+    return [
+        {
+            label: 'Dashboard',
+            href: route('dashboard'),
+            icon: LayoutGrid,
+            active: route().current('dashboard'),
+        },
+        {
+            label: 'Perfil',
+            href: route('profile.edit'),
+            icon: UserRound,
+            active: route().current('profile.*'),
+        },
+    ];
+});
 </script>
 
 <template>
-    <Sidebar collapsible="icon" variant="inset">
-        <SidebarHeader>
-            <SidebarMenu>
-                <SidebarMenuItem>
-                    <SidebarMenuButton size="lg" as-child>
-                        <Link :href="dashboard()">
-                            <AppLogo />
-                        </Link>
-                    </SidebarMenuButton>
-                </SidebarMenuItem>
-            </SidebarMenu>
-        </SidebarHeader>
+    <div class="flex h-full flex-col gap-4 p-4">
+        <Link :href="route('dashboard')" class="px-2 py-1">
+            <AppLogo />
+        </Link>
 
-        <SidebarContent>
-            <NavMain :items="mainNavItems" />
-        </SidebarContent>
-
-        <SidebarFooter>
-            <NavFooter :items="footerNavItems" />
-            <NavUser />
-        </SidebarFooter>
-    </Sidebar>
-    <slot />
+        <nav class="flex flex-col gap-1">
+            <Link
+                v-for="item in items"
+                :key="item.href"
+                :href="item.href"
+                class="flex items-center gap-3 rounded-md px-3 py-2 text-sm transition-colors"
+                :class="
+                    item.active
+                        ? 'bg-primary/10 text-primary font-medium'
+                        : 'text-surface-600 dark:text-surface-300 hover:bg-surface-100 dark:hover:bg-surface-800'
+                "
+                @click="$emit('navigate')"
+            >
+                <component :is="item.icon" class="size-4" />
+                {{ item.label }}
+            </Link>
+        </nav>
+    </div>
 </template>

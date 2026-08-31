@@ -1,114 +1,133 @@
 <script setup lang="ts">
-import { Form, Head } from '@inertiajs/vue3';
-import InputError from '@/components/InputError.vue';
-import PasswordInput from '@/components/PasswordInput.vue';
-import TextLink from '@/components/TextLink.vue';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Spinner } from '@/components/ui/spinner';
-import { login } from '@/routes';
-import { store } from '@/routes/register';
+import { Head, Link, useForm } from '@inertiajs/vue3';
+import Button from 'primevue/button';
+import Card from 'primevue/card';
+import InputText from 'primevue/inputtext';
+import Message from 'primevue/message';
+import Password from 'primevue/password';
+import { route } from 'ziggy-js';
 
-defineProps<{
-    passwordRules: string;
-}>();
-
-defineOptions({
-    layout: {
-        title: 'Create an account',
-        description: 'Enter your details below to create your account',
-    },
+const form = useForm({
+    name: '',
+    email: '',
+    password: '',
+    password_confirmation: '',
 });
+
+function submit() {
+    form.post(route('register.store'), {
+        onFinish: () => form.reset('password', 'password_confirmation'),
+    });
+}
 </script>
 
 <template>
-    <Head title="Register" />
+    <Head title="Cadastro" />
 
-    <Form
-        v-bind="store.form()"
-        :reset-on-success="['password', 'password_confirmation']"
-        v-slot="{ errors, processing }"
-        class="flex flex-col gap-6"
-    >
-        <div class="grid gap-6">
-            <div class="grid gap-2">
-                <Label for="name">Name</Label>
-                <Input
-                    id="name"
-                    type="text"
-                    required
-                    autofocus
-                    :tabindex="1"
-                    autocomplete="name"
-                    name="name"
-                    placeholder="Full name"
+    <Card>
+        <template #title>Criar conta</template>
+        <template #subtitle>Preencha os dados para começar</template>
+        <template #content>
+            <form class="flex flex-col gap-4" @submit.prevent="submit">
+                <div class="flex flex-col gap-1">
+                    <label for="name" class="text-sm font-medium">Nome</label>
+                    <InputText
+                        id="name"
+                        v-model="form.name"
+                        autocomplete="name"
+                        autofocus
+                        :invalid="!!form.errors.name"
+                        fluid
+                    />
+                    <Message
+                        v-if="form.errors.name"
+                        severity="error"
+                        variant="simple"
+                        size="small"
+                    >
+                        {{ form.errors.name }}
+                    </Message>
+                </div>
+
+                <div class="flex flex-col gap-1">
+                    <label for="email" class="text-sm font-medium"
+                        >E-mail</label
+                    >
+                    <InputText
+                        id="email"
+                        v-model="form.email"
+                        type="email"
+                        autocomplete="email"
+                        :invalid="!!form.errors.email"
+                        fluid
+                    />
+                    <Message
+                        v-if="form.errors.email"
+                        severity="error"
+                        variant="simple"
+                        size="small"
+                    >
+                        {{ form.errors.email }}
+                    </Message>
+                </div>
+
+                <div class="flex flex-col gap-1">
+                    <label for="password" class="text-sm font-medium"
+                        >Senha</label
+                    >
+                    <Password
+                        input-id="password"
+                        v-model="form.password"
+                        toggle-mask
+                        :feedback="false"
+                        autocomplete="new-password"
+                        :invalid="!!form.errors.password"
+                        fluid
+                    />
+                    <Message
+                        v-if="form.errors.password"
+                        severity="error"
+                        variant="simple"
+                        size="small"
+                    >
+                        {{ form.errors.password }}
+                    </Message>
+                </div>
+
+                <div class="flex flex-col gap-1">
+                    <label
+                        for="password_confirmation"
+                        class="text-sm font-medium"
+                    >
+                        Confirmar senha
+                    </label>
+                    <Password
+                        input-id="password_confirmation"
+                        v-model="form.password_confirmation"
+                        toggle-mask
+                        :feedback="false"
+                        autocomplete="new-password"
+                        fluid
+                    />
+                </div>
+
+                <Button
+                    type="submit"
+                    label="Cadastrar"
+                    :loading="form.processing"
+                    fluid
                 />
-                <InputError :message="errors.name" />
-            </div>
 
-            <div class="grid gap-2">
-                <Label for="email">Email address</Label>
-                <Input
-                    id="email"
-                    type="email"
-                    required
-                    :tabindex="2"
-                    autocomplete="email"
-                    name="email"
-                    placeholder="email@example.com"
-                />
-                <InputError :message="errors.email" />
-            </div>
-
-            <div class="grid gap-2">
-                <Label for="password">Password</Label>
-                <PasswordInput
-                    id="password"
-                    required
-                    :tabindex="3"
-                    autocomplete="new-password"
-                    name="password"
-                    placeholder="Password"
-                    :passwordrules="passwordRules"
-                />
-                <InputError :message="errors.password" />
-            </div>
-
-            <div class="grid gap-2">
-                <Label for="password_confirmation">Confirm password</Label>
-                <PasswordInput
-                    id="password_confirmation"
-                    required
-                    :tabindex="4"
-                    autocomplete="new-password"
-                    name="password_confirmation"
-                    placeholder="Confirm password"
-                    :passwordrules="passwordRules"
-                />
-                <InputError :message="errors.password_confirmation" />
-            </div>
-
-            <Button
-                type="submit"
-                class="mt-2 w-full"
-                tabindex="5"
-                :disabled="processing"
-                data-test="register-user-button"
-            >
-                <Spinner v-if="processing" />
-                Create account
-            </Button>
-        </div>
-
-        <div class="text-muted-foreground text-center text-sm">
-            Already have an account?
-            <TextLink
-                :href="login()"
-                class="underline underline-offset-4"
-                :tabindex="6"
-                >Log in</TextLink
-            >
-        </div>
-    </Form>
+                <p class="text-surface-500 text-center text-sm">
+                    Já tem conta?
+                    <Link
+                        :href="route('login')"
+                        class="text-primary font-medium"
+                    >
+                        Entrar
+                    </Link>
+                </p>
+            </form>
+        </template>
+    </Card>
 </template>

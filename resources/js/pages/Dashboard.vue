@@ -1,47 +1,27 @@
 <script setup lang="ts">
-import { Head } from '@inertiajs/vue3';
-import PlaceholderPattern from '@/components/PlaceholderPattern.vue';
-import { dashboard } from '@/routes';
+import { Head, usePage } from '@inertiajs/vue3';
+import Card from 'primevue/card';
+import { computed } from 'vue';
+import Breadcrumbs from '@/components/Breadcrumbs.vue';
+import type { User } from '@/types';
 
-defineOptions({
-    layout: {
-        breadcrumbs: [
-            {
-                title: 'Dashboard',
-                href: dashboard(),
-            },
-        ],
-    },
-});
+const user = computed(() => usePage().props.auth.user as User | null);
 </script>
 
 <template>
     <Head title="Dashboard" />
 
-    <div
-        class="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4"
-    >
-        <div class="grid auto-rows-min gap-4 md:grid-cols-3">
-            <div
-                class="border-sidebar-border/70 dark:border-sidebar-border relative aspect-video overflow-hidden rounded-xl border"
-            >
-                <PlaceholderPattern />
-            </div>
-            <div
-                class="border-sidebar-border/70 dark:border-sidebar-border relative aspect-video overflow-hidden rounded-xl border"
-            >
-                <PlaceholderPattern />
-            </div>
-            <div
-                class="border-sidebar-border/70 dark:border-sidebar-border relative aspect-video overflow-hidden rounded-xl border"
-            >
-                <PlaceholderPattern />
-            </div>
-        </div>
-        <div
-            class="border-sidebar-border/70 dark:border-sidebar-border relative min-h-[100vh] flex-1 rounded-xl border md:min-h-min"
-        >
-            <PlaceholderPattern />
-        </div>
+    <div class="space-y-4">
+        <Breadcrumbs :items="[{ label: 'Dashboard' }]" />
+
+        <Card>
+            <template #title>Bem-vindo(a), {{ user?.name }}</template>
+            <template #content>
+                <p class="text-surface-500">
+                    Este é o ponto de partida do painel. Use o menu lateral para
+                    navegar.
+                </p>
+            </template>
+        </Card>
     </div>
 </template>
