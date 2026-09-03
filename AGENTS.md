@@ -21,6 +21,8 @@ Starter kit Laravel + Vue (Inertia) usado como template para novos projetos. Rec
 - Lint/format front: **vite-plus** (`vp`), não ESLint/Prettier. Types: `vue-tsc`.
 - `.editorconfig` na raiz define whitespace/indent.
 - Flash/toast via `Inertia::flash('toast', [...])` -> `components/FlashToasts.vue`. Datas via `resources/js/lib/datetime.ts`.
+- Cabeçalho de página: toda página usa `<PageHeader>` (`components/PageHeader.vue`) como primeiro filho — `title` obrigatório, `subtitle` opcional, `breadcrumbs` (array de `BreadcrumbItem`) opcional; slot `#actions` para botões da página.
+- Navegação entre rotas internas: sempre Inertia `<Link>` ou `router.visit`/`router.*`, nunca `<a href>` puro nem `url` em item de menu PrimeVue (quebra o SPA). Ver `docs/knowledge/navegacao-spa-links.md`.
 
 ## Comandos
 
